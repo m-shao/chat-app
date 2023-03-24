@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser')
 const cors = require("cors")
 const bcrypt = require("bcryptjs")
 const UserModel = require('./models/User')
+const MessageModel = require("./models/Messages")
 const ws = require("ws")
 
 
@@ -97,13 +98,24 @@ wss.on('connection', (connection, req) => {
         }
     }
 
-    connection.on('message', (message) => {
+    connection.on('message', async(message) => {
         const messageData = JSON.parse(message.toString())
         const {recipient, text} = messageData
         if (recipient && text){
+            const messageDoc = await MessageModel.create({
+                sender: connection.userId,
+                recipient: recipient,
+                text: text,
+
+            });
             [...wss.clients]
                 .filter(c => c.userId === recipient)
-                .forEach(c => c.send(JSON.stringify({text:text})))
+                .forEach(c => c.send(JSON.stringify({
+                    text:text, 
+                    sender: connection.userId,
+                    recipient: recipient,
+                    id: messageDoc._id
+                })))
         }
     });
 
