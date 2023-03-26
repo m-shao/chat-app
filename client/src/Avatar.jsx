@@ -1,6 +1,6 @@
 import React from 'react'
 
-function Avatar({userId, username}) {
+function Avatar({userId, username, online}) {
 
     const colors = ['bg-red-200', 'bg-green-200', 'bg-purple-200', 
                     'bg-clue-200', 'bg-yellow-200', 'bg-teal-200']
@@ -10,8 +10,9 @@ function Avatar({userId, username}) {
     const color = colors[colorIndex]
 
     return (
-        <div className={'w-8 h-8 rounded-full flex items-center justify-center weight ' + color}>
+        <div className={'w-8 h-8 relative rounded-full flex items-center justify-center weight ' + color}>
             <div className='text-center w-full opacity-70'>{username[0]}</div>
+            <div className={'absolute w-3 h-3 border border-white rounded-full right-0 bottom-0 ' + (online ? "bg-green-500" : "bg-gray-400")}></div>
         </div>
     )
 }
