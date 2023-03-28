@@ -137,7 +137,6 @@ const wss = new ws.WebSocketServer({server})
 
 //on connection
 wss.on('connection', (connection, req) => {
-
     const notifyAboutOnlinePeople = () => {
         //notify everyone about online people (when someone connects)
         [...wss.clients].forEach(client => {
@@ -159,7 +158,6 @@ wss.on('connection', (connection, req) => {
             clearInterval(connection.timer)
             connection.terminate()
             notifyAboutOnlinePeople()
-            console.log('dead')
         }, 1000)
       }, 5000)
     

@@ -2,10 +2,8 @@ import { useEffect, useState, useContext, useRef} from "react"
 import axios from 'axios'
 
 import {uniqBy} from 'lodash'
-
-import Contact from "./Contact"
-import Logo from "./Logo"
-import { UserContext } from "./UserContext"
+import Sidebar from "./Sidebar"
+import { UserContext } from "../context/UserContext"
 
 function Chat() {
     //init states
@@ -57,6 +55,7 @@ function Chat() {
         } else if ('text' in messageData) {
             //if the message reveiveed is from the current user, add it to the conversation
             if (messageData.sender === selectedUserId) {
+                console.log(messageData.sender)
                 setMessages(prev => ([...prev, {...messageData}]))
             }
         }
@@ -152,39 +151,17 @@ function Chat() {
 
     //remove duplicates from message because of double sends
     const messagesWithoutDupes = uniqBy(messages, '_id')
+
+    function changeSelectedUserId (id) {
+        setSelectedUserId(id)
+    }
     return (
         <div className="flex h-screen">
-            <div className="bg-white w-1/3 pt-6 flex flex-col">
-                <div className="flex-grow">
-                    <Logo/>
-                    {Object.keys(onlinePeopleExcludeSelf).map(userId => (
-                    <Contact
-                        key={userId}
-                        id={userId}
-                        online={true}
-                        username={onlinePeopleExcludeSelf[userId]}
-                        onClick={() => setSelectedUserId(userId)}
-                        selected={userId === selectedUserId} />
-                    ))}
-                    {Object.keys(offlinePeople).map(userId => (
-                        <Contact
-                        key={userId}
-                        id={userId}
-                        online={false}
-                        username={offlinePeople[userId].username}
-                        onClick={() => setSelectedUserId(userId)}
-                        selected={userId === selectedUserId} />
-                    ))}
-                </div> 
-                <div className="p-2 text-center">
-                    <span className="mr-2 text-sm, text-gray-600">Logged In as {username}</span>
-                    <button 
-                        onClick={logout}
-                        className="text-sm text-gray-500 bg-blue-100 py-1 px-2 border rounded-md">
-                        Logout
-                        </button>
-                </div>
-            </div>
+            <Sidebar onlinePeopleExcludeSelf={onlinePeopleExcludeSelf} 
+                    selectedUserId={selectedUserId} 
+                    changeSelectedUserId={changeSelectedUserId}
+                    offlinePeople={offlinePeople}
+                    username={username} logout={logout}/>
 
             <div className="flex flex-col bg-blue-50 w-2/3 p-2">
                 <div className="flex-grow">
