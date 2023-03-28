@@ -8,14 +8,18 @@ const bcrypt = require("bcryptjs")
 const UserModel = require('./models/User')
 const MessageModel = require("./models/Messages")
 const ws = require("ws")
+const fs = require("fs")
 
-
+//config and import secrets
 dotenv.config()
 mongoose.connect(process.env.MONGO_URL)
 const jwtSecret = process.env.JWT_SECRET
 const bcryptSalt = bcrypt.genSaltSync(10)
 
 const app = express()
+
+//setup
+app.use('/uploads', express.static(__dirname + '/uploads'))
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
@@ -23,6 +27,8 @@ app.use(cors({
     origin: process.env.CLIENT_URL
 }))
 
+
+//
 const getUserDataFromRequest = async (req) => {
     return new Promise((resolve, reject) => {
         const token = req.cookies?.token
@@ -37,26 +43,32 @@ const getUserDataFromRequest = async (req) => {
     })
 }
 
+//test to verify server
 app.get("/test", (req, res) => {
     res.json("test ok")
 })
 
+//search for messages on user request
 app.get("/messages/:userId", async (req, res) => {
+    // 
     const {userId} = req.params;
     const userData = await getUserDataFromRequest(req)
     const ourUserId = userData.userId
+    //go into db and look for sender messages with our sender/recipient, sort in chronological order
     const messages = await MessageModel.find({
         sender: {$in:[userId, ourUserId]},
         recipient:{$in:[userId, ourUserId]}
-    }).sort({createdAt: true})
+    }).sort({createdAt: 1})
     res.json(messages)
 })
 
+//if user requests people, search db find people
 app.get('/people', async(req, res) => { 
-    const users = await UserModel.find({}, {'_id': true, username: true})
+    const users = await UserModel.find({}, {'_id': 1, username: 1})
     res.json(users)
 })
 
+//profile request, verify that browser has a token in cookies, if so send the user's data
 app.get("/profile", (req, res) => {
     const token = req.cookies?.token
     if (token) {
@@ -70,10 +82,13 @@ app.get("/profile", (req, res) => {
     
 })
 
+//on login request
 app.post("/login", async(req, res) => {
+    //look for the user's name
     const {username, password} = req.body;
     UserModel.find({username})
     const foundUser = await UserModel.findOne({username})
+    //compare decrypted password
     if (foundUser){
         const passOk = bcrypt.compareSync(password, foundUser.password)
         if (passOk) {
@@ -87,13 +102,17 @@ app.post("/login", async(req, res) => {
     }
 })
 
+//clear cookies on logout
 app.post("/logout", async(req, res) => {
     res.cookie('/token', '', {sameSite:'none', secure:true}).json("ok")
 })
 
+//on register
 app.post("/register", async (req, res) => {
+    //get username and password
     const {username, password} = req.body
     try{    
+        //hash the password, create a user in the db and sign the token in cookies
         const hashedPassword = bcrypt.hashSync(password, bcryptSalt)
         const createdUser = await UserModel.create({username: username, password: hashedPassword})
         jwt.sign({userId: createdUser._id, username:username}, jwtSecret, {}, (err, token) => {
@@ -109,10 +128,13 @@ app.post("/register", async (req, res) => {
     
 })
 
+//start server at port 4040
 const server = app.listen(4040)
 
+//start web socket connection server
 const wss = new ws.WebSocketServer({server})
 
+//on connection
 wss.on('connection', (connection, req) => {
 
     const notifyAboutOnlinePeople = () => {
@@ -127,16 +149,20 @@ wss.on('connection', (connection, req) => {
 
     connection.isAlive = true
 
+    //evert 5 seconds send a ping to see if user is still online
     connection.timer = setInterval(() => {
-        connection.ping()
+        connection.ping();
+        //if the user does not respond in 1 second, kill their connection
         connection.deathTimer = setTimeout(() => {
-            connection.isAlive = false;
+            connection.isAlive = false
             clearInterval(connection.timer)
-            connection.terminate
+            connection.terminate()
             notifyAboutOnlinePeople()
+            console.log('dead')
         }, 1000)
-    }, 5000)
-
+      }, 5000)
+    
+    //if the user repsonds, don't kill connection
     connection.on('pong', () => {
         clearTimeout(connection.deathTimer)
     })
@@ -160,13 +186,24 @@ wss.on('connection', (connection, req) => {
 
     connection.on('message', async(message) => {
         const messageData = JSON.parse(message.toString())
-        const {recipient, text} = messageData
-        if (recipient && text){
+        const {recipient, text, file} = messageData
+        let filename = null
+        if (file){
+            const parts = file.name.split('.')
+            const ext = parts[parts.length-1]
+            filename = Date.now() + '.' + ext
+            const path = __dirname + '/uploads/' + filename
+            const bufferData = new Buffer.from(file.data.split(',')[1], 'base64')
+            fs.writeFile(path, bufferData, () => {
+                console.log('file saved:' + path)
+            })
+        }
+        if (recipient && text || file){
             const messageDoc = await MessageModel.create({ 
                 sender: connection.userId,
                 recipient: recipient,
                 text: text,
-
+                file: file ? filename : null,
             });
             [...wss.clients]
                 .filter(c => c.userId === recipient)
@@ -174,6 +211,7 @@ wss.on('connection', (connection, req) => {
                     text:text, 
                     sender: connection.userId,
                     recipient: recipient,
+                    file: file ? filename : null,
                     _id: messageDoc._id
                 })))
         }
