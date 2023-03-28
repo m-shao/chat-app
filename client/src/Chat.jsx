@@ -8,7 +8,7 @@ import Logo from "./Logo"
 import { UserContext } from "./UserContext"
 
 function Chat() {
-    
+    //init states
     const [ws, setWs] = useState(null)
     const [onlinePeople, setOnlinePeople] = useState({})
     const [offlinePeople, setOfflinePeople] = useState({})
@@ -18,14 +18,18 @@ function Chat() {
     const {username, id, setUsername, setId} = useContext(UserContext)
     const divUnderMessages = useRef()
 
+    //connect to user's web socket whenever we switch users
     useEffect(() => {
         connectToWs()
     }, [selectedUserId])
 
+    //connect to websocket
     function connectToWs() {
         const ws = new WebSocket('ws://localhost:4040')
         setWs(ws)
+        //whenever message is reveived: handle message
         ws.addEventListener('message', handleMessage)
+        //whenever ws closes: reconnect
         ws.addEventListener('close', () => {
             setTimeout(() => {
                 console.log('Disconnected, Trying to Reconnect')
@@ -34,6 +38,7 @@ function Chat() {
         })
     }
 
+    //set onlinePeople state to object of online people
     function showOnlinePeople(peopleArray){
         const people = {}
         peopleArray.forEach(({userId, username}) => {
@@ -42,17 +47,22 @@ function Chat() {
         setOnlinePeople(people)
     }
 
+    //when message is reveived:
     function handleMessage(e) {
+        //reveive message data
         const messageData = JSON.parse(e.data)
+        
         if ('online' in messageData) {
-          showOnlinePeople(messageData.online)
+            showOnlinePeople(messageData.online)
         } else if ('text' in messageData) {
-          if (messageData.sender === selectedUserId) {
-            setMessages(prev => ([...prev, {...messageData}]))
-          }
+            //if the message reveiveed is from the current user, add it to the conversation
+            if (messageData.sender === selectedUserId) {
+                setMessages(prev => ([...prev, {...messageData}]))
+            }
         }
       }
 
+    //when user requests a logout, terminate web socket, remove id and username
     function logout() {
         axios.post('/logout').then(() => {
             setWs(null)
@@ -61,23 +71,29 @@ function Chat() {
         })
     }
 
+    //when you send a message:
     function sendMessage(e, file = null){
+        //if an event is provided(which mean's it's not a file)
         if (e){
             e.preventDefault()
         }
         
+        //send message to backend with the who you're sending it to, the text or the file
         ws.send(JSON.stringify({
             recipient: selectedUserId,
             text: newMessageText,
             file: file,
         }))
+        //reset the text field
         setNewMessageText("")
+        //append the message onto messages state
         setMessages(prev => ([...prev, {
             text: newMessageText,
             sender: id,
             recipient: selectedUserId,
             _id: Date.now()
         }]))
+        //if there is a file, 
         if (file) {
             axios.get('/messages/' + selectedUserId).then(res => {
                 setMessages(res.data)
@@ -86,8 +102,10 @@ function Chat() {
     }
 
     function sendFile(e){
+        //create a reader object and read the file given
         const reader = new FileReader()
         reader.readAsDataURL(e.target.files[0])
+        //send a message with the file attached and no event
         reader.onload = () => {
             sendMessage(null, {
                 name: e.target.files[0].name,
@@ -97,13 +115,15 @@ function Chat() {
         
     }
 
-
+    //whenever we add a message scroll to the bottom
     useEffect(() => {
         const div = divUnderMessages?.current
         div?.scrollIntoView({behaviour: 'smooth', block:'end'})
     }, [messages])
 
+    //whenever the online people changes, find the people who are offline and setOfflinePeople(offlinePeople)
     useEffect(() => {
+        //filter the online people out and then put into object form
         axios.get('/people').then(res => {
             const offlinePeopleArr = res.data
                                 .filter(p => p._id !==id)
@@ -112,12 +132,11 @@ function Chat() {
             offlinePeopleArr.forEach(p => {
                 offlinePeople[p._id] = p
             })
-            setOfflinePeople(offlinePeople)
-            
+            setOfflinePeople(offlinePeople)          
         })
-
     }, [onlinePeople])
 
+    //once we chose a user to talk to, load all their messages
     useEffect(() => {
         if (selectedUserId){
             axios.get('/messages/' + selectedUserId).then(res => {
@@ -127,9 +146,11 @@ function Chat() {
         }
     }, [selectedUserId])
 
+    //get a list of online people exluding the user
     const onlinePeopleExcludeSelf = {...onlinePeople}
     delete onlinePeopleExcludeSelf[id]
 
+    //remove duplicates from message because of double sends
     const messagesWithoutDupes = uniqBy(messages, '_id')
     return (
         <div className="flex h-screen">

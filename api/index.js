@@ -115,6 +115,7 @@ app.post("/register", async (req, res) => {
         //hash the password, create a user in the db and sign the token in cookies
         const hashedPassword = bcrypt.hashSync(password, bcryptSalt)
         const createdUser = await UserModel.create({username: username, password: hashedPassword})
+        //create jwt and add it to cookie 
         jwt.sign({userId: createdUser._id, username:username}, jwtSecret, {}, (err, token) => {
             if (err) throw err
             res.cookie("token", token, {sameSite: 'none', secure:true}).status(201).json({
@@ -170,9 +171,11 @@ wss.on('connection', (connection, req) => {
     //read username and id from the cookie for this connection
     const cookies = req.headers.cookie
     if (cookies){
+        //split and search cookies for token
         const tokenCookieString = cookies.split(";").find(str => str.startsWith('token='))
         if (tokenCookieString){
             const token = tokenCookieString.split("=")[1]
+            //if we find a token in the cookies, verify the token and create a new connection
             if (token){
                 jwt.verify(token, jwtSecret, {}, (err, userData) => {
                     if (err) throw err
@@ -185,12 +188,16 @@ wss.on('connection', (connection, req) => {
     }
 
     connection.on('message', async(message) => {
+        // reveive message from user
         const messageData = JSON.parse(message.toString())
         const {recipient, text, file} = messageData
         let filename = null
+        //if the message contains a file
         if (file){
+            //split file name into parts into extention
             const parts = file.name.split('.')
             const ext = parts[parts.length-1]
+            //use DateTime as the file name 
             filename = Date.now() + '.' + ext
             const path = __dirname + '/uploads/' + filename
             const bufferData = new Buffer.from(file.data.split(',')[1], 'base64')
@@ -222,6 +229,7 @@ wss.on('connection', (connection, req) => {
    
 })
 
+//on close, confirm disconnect
 wss.on('close', () => {
     console.log('disconnected', data)
 })
