@@ -104,7 +104,7 @@ app.post("/login", async(req, res) => {
 
 //clear cookies on logout
 app.post("/logout", async(req, res) => {
-    res.cookie('/token', '', {sameSite:'none', secure:true}).json("ok")
+    res.clearCookie('token').json("ok")
 })
 
 //on register
