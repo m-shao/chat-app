@@ -3,6 +3,7 @@ import axios from 'axios'
 
 import {uniqBy} from 'lodash'
 import Sidebar from "./Sidebar"
+import MessagesDisplay from "./MessagesDisplay"
 import { UserContext } from "../context/UserContext"
 
 function Chat() {
@@ -13,6 +14,7 @@ function Chat() {
     const [selectedUserId, setSelectedUserId] = useState("")
     const [newMessageText, setNewMessageText] = useState("")
     const [messages, setMessages] = useState([])
+
     const {username, id, setUsername, setId} = useContext(UserContext)
     const divUnderMessages = useRef()
 
@@ -135,6 +137,12 @@ function Chat() {
         })
     }, [onlinePeople])
 
+    // useEffect(() => {
+    //     sendFriendRequests("ashley1")
+    //     getFriendRequests()
+        
+    // }, [])
+
     //once we chose a user to talk to, load all their messages
     useEffect(() => {
         if (selectedUserId){
@@ -176,35 +184,7 @@ function Chat() {
                     {!!selectedUserId && (
                         <div className="relative h-full">
                             <div className="overflow-y-scroll absolute top-0 left-0 right-0 bottom-2">
-                                {messagesWithoutDupes.map((message, index) => (
-                                    <div key={index} dir={message.sender === id ? 'rtl' : 'ltr'} className={"block"}>
-                                        <div className={"max-w-xl sm:max-w-[80%] block"}>
-                                            <div className={"p-2 px-4 m-2 rounded-2xl inline-block " + 
-                                            (message.sender === id ? 'bg-blue-500 text-white' : 'bg-white text-gray-500')}>
-                                                <h1 dir="ltr">
-                                                    {message.text}
-                                                    {message.file && (
-                                                        <div>
-                                                            {
-                                                            ["png", "jpg", "jpeg", "gif", "svg"].includes(message.file.split(".")[1])? 
-                                                            <a><img className="max-w-sm max-h-48 w-full rounded-2xl" src={axios.defaults.baseURL + "/uploads/" + message.file}/></a> :
-                                                            <div className="flex items-center">
-                                                                <div className="flex items-center">
-                                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
-                                                                    </svg>
-                                                                    <a target={"_blank"} className="underline" href={axios.defaults.baseURL + "/uploads/" + message.file}>
-                                                                        {message.file}
-                                                                    </a>
-                                                                </div>
-                                                            </div>}
-                                                        </div>
-                                                    )}
-                                                </h1>        
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
+                                <MessagesDisplay messagesWithoutDupes={messagesWithoutDupes} id={id}/>
                                 <div ref={divUnderMessages}></div>
                             </div>
                         </div>

@@ -59,7 +59,6 @@ app.get("/messages/:userId", async (req, res) => {
         sender: {$in:[userId, ourUserId]},
         recipient:{$in:[userId, ourUserId]}
     }).sort({createdAt: 1})
-    res.json(messages)
 })
 
 //if user requests people, search db find people
@@ -79,8 +78,33 @@ app.get("/profile", (req, res) => {
     } else {
         res.status(401).json("no token")
     }
+})
+
+app.post("/friend-request", async(req, res) => {
+    const {username, target} = req.body
+    if (target != username){
+        console.log(target)
+        UserModel.findOneAndUpdate(
+            {username: target},
+            { $addToSet: { frequests: [username] } },
+            { new: true }).then((yes) => {
+                console.log(yes)
+            })
+    }
     
 })
+
+app.get("/friend-requests/:username", async(req, res) => {
+    const {username} = req.params
+    const user = await UserModel.findOne({username: username})
+    console.log(user?.frequests)
+    res.json(user?.frequests)
+    
+})
+
+// app.post("/request-accept", async(req, res) => {
+    
+// })
 
 //on login request
 app.post("/login", async(req, res) => {
