@@ -1,6 +1,8 @@
 import {useState} from 'react'
 
-function FriendRequests({sendFriendRequests}) {
+import Contact from './Contact'
+
+function FriendRequests({friendRequests, sendFriendRequests}) {
     const [newFriend, setNewFriend] = useState('')
     
     const handleText = (e) => {
@@ -16,8 +18,9 @@ function FriendRequests({sendFriendRequests}) {
     }
 
     return (
-        <div className='flex-grow overflow-x-scroll'>
-            <form action="" className='w-full flex justify-center flex-row pl-5 pr-2 gap-2 mb-3' onSubmit={handleSubmit}> 
+        <div className='flex-grow overflow-x-scroll mt-2'>
+            <div>
+                <form action="" className='w-full flex justify-center flex-row pl-5 pr-2 gap-2 mb-2' onSubmit={handleSubmit}> 
                     <input 
                         value={newFriend}
                         onChange={handleText} 
@@ -29,6 +32,16 @@ function FriendRequests({sendFriendRequests}) {
                         </svg>
                     </button>
                 </form>
+            </div>
+            <div>
+                {friendRequests.map((username, index) => (
+                <Contact
+                    key={index}
+                    username={username}
+                    request={true}
+                />
+                ))}
+            </div>
         </div>
     )
 }

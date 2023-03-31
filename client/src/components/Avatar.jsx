@@ -1,11 +1,19 @@
 import React from 'react'
 
-function Avatar({userId, username, online}) {
-
+function Avatar({username, online}) {
     const colors = ['bg-red-200', 'bg-green-200', 'bg-purple-200', 
                     'bg-clue-200', 'bg-yellow-200', 'bg-teal-200']
 
-    const userIdBase10 = parseInt(userId, 16)
+    function stringToNumbers(string) {
+        let numbers = [];
+        for (let i = 0; i < string.length; i++) {
+            let number = string.charCodeAt(i);
+            numbers.push(number);
+        }
+        return numbers;
+    }                
+
+    const userIdBase10 = parseInt(stringToNumbers(username), 16)
     const colorIndex = userIdBase10 % colors.length
     const color = colors[colorIndex]
 
