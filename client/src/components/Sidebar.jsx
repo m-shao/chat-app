@@ -16,9 +16,18 @@ function Sidebar({onlinePeopleExcludeSelf, selectedUserId, changeSelectedUserId,
     }
 
     const getFriendRequests = async(user) => {
-        const tempFriendRequests = await axios.get("/friend-requests/" + user)
-        console.log(tempFriendRequests?.data)
+        const tempFriendRequests = await axios.get("/friend-request/" + user)
         setFriendRequests(tempFriendRequests?.data)
+    }
+
+    const verifyFriendRequests = async(username, target, state) => {
+        const tempArr = [...friendRequests]
+        let index = tempArr.indexOf(username);
+        if (index !== -1) {
+            tempArr.splice(index, 1);
+        }
+        setFriendRequests(tempArr)
+        const tempFriends = await axios.put("/friend-request", {username:target, target:username, state:state})
     }
 
     useEffect(() => {
@@ -42,7 +51,9 @@ function Sidebar({onlinePeopleExcludeSelf, selectedUserId, changeSelectedUserId,
             
             {friendRequestPage ? 
                 <FriendRequests sendFriendRequests={sendFriendRequests} 
-                                friendRequests={friendRequests}/> :
+                                friendRequests={friendRequests}
+                                verifyFriendRequests={verifyFriendRequests}
+                                user={username}/> :
                 <Friends onlinePeopleExcludeSelf={onlinePeopleExcludeSelf} 
                     selectedUserId={selectedUserId} 
                     changeSelectedUserId={changeSelectedUserId} 

@@ -2,7 +2,7 @@ import {useState} from 'react'
 
 import Contact from './Contact'
 
-function FriendRequests({friendRequests, sendFriendRequests}) {
+function FriendRequests({friendRequests, sendFriendRequests, verifyFriendRequests, user}) {
     const [newFriend, setNewFriend] = useState('')
     
     const handleText = (e) => {
@@ -39,6 +39,8 @@ function FriendRequests({friendRequests, sendFriendRequests}) {
                     key={index}
                     username={username}
                     request={true}
+                    verifyFriendRequests={verifyFriendRequests}
+                    user={user}
                 />
                 ))}
             </div>

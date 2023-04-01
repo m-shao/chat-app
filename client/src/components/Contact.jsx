@@ -1,14 +1,14 @@
 import Avatar from "./Avatar.jsx";
 
-function Contact({id, username, onClick, selected, online, request}) {
+function Contact({id, username, onClick, selected, online, request, verifyFriendRequests, user}) {
     return (
         <div key={id ? id : username} 
             onClick={id?() => onClick(id): () => {}}
-            className={"border-b border-gray-100 flex justify-between items-center gap-2 cursor-pointer pr-4"
+            className={"border-b border-gray-100 flex justify-between items-center gap-2 cursor-pointer pr-4 "
             + (selected ? 'bg-blue-50' : '')}>   
             <div>
                 {selected && (
-                    <div className="w-1 bg-blue-500 h-12 rounded-r-md"></div>
+                    <div className="w-1 bg-blue-500 h-12 rounded-r-md absolute"></div>
                 )}
                 <div className="flex gap-2 py-2 pl-4 items-center">
                     <Avatar online={online} username={username}/>
@@ -17,7 +17,7 @@ function Contact({id, username, onClick, selected, online, request}) {
             </div> 
             {request && 
                 <div className="flex items-center gap-2">
-                    <button>
+                    <button onClick={() => {verifyFriendRequests(username, user, true)}}>
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="hover:brightness-90">
                             <g clipPath="url(#clip0_3_15)">
                                 <circle cx="10" cy="10" r="9.5" fill="white" stroke="#D1D5DB"/>
@@ -30,7 +30,7 @@ function Contact({id, username, onClick, selected, online, request}) {
                             </defs>
                         </svg>
                     </button>
-                    <button>
+                    <button onClick={() => {verifyFriendRequests(username, user, false)}}>
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="hover:brightness-90">
                             <g clipPath="url(#clip0_3_19)">
                                 <circle cx="10" cy="10" r="9.5" fill="white" stroke="#D1D5DB"/>

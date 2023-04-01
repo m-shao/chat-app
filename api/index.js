@@ -83,20 +83,55 @@ app.get("/profile", (req, res) => {
 
 app.post("/friend-request", async(req, res) => {
     const {username, target} = req.body
+    
     if (target != username){
         UserModel.findOneAndUpdate(
             {username: target},
             { $addToSet: { frequests: [username] } },
-            { new: true })
+            { new: true }).then((hello) => {
+                console.log(hello)
+        })
     }
     
 })
 
-app.get("/friend-requests/:username", async(req, res) => {
+app.get("/friend-request/:username", async(req, res) => {
     const {username} = req.params
     const user = await UserModel.findOne({username: username})
-    res.json(user?.frequests)
-    
+
+    res.json(user?.frequests) 
+})
+
+app.put("/friend-request/", async(req, res) => {
+    const {username, target, state} = req.body
+    UserModel.findOneAndUpdate(
+        {username: username},
+        { $pull: { frequests: target } },
+        { new: true }).then((hello) => {
+            console.log(hello)
+    })
+    if (state){
+        UserModel.findOneAndUpdate(
+            {username: username},
+            { $addToSet: { friends: [target] } },
+            { new: true }).then((hello) => {
+                console.log(hello)
+        })
+        UserModel.findOneAndUpdate(
+            {username: target},
+            { $addToSet: { friends: [username] } },
+            { new: true }).then((hello) => {
+                console.log(hello)
+        })
+    }
+
+})
+
+app.get("/friends/:username", async(req, res) => {
+    const {username} = req.params
+    const user = await UserModel.findOne({username: username})
+
+    res.json(user?.friends) 
 })
 
 //on login request
@@ -157,18 +192,18 @@ wss.on('connection', (connection, req) => {
     const notifyAboutOnlinePeople = () => {
         //notify everyone about online people (when someone connects)
         [...wss.clients].forEach(client => {
-        client.send(JSON.stringify({
-            online: [...wss.clients].map(c => ({userId:c.userId, username:c.username}))
-        }
-        ))
-    })
+                client.send(JSON.stringify({
+                    online: [...wss.clients].map(c => ({userId:c.userId, username:c.username}))
+                }
+            ))
+        })
     }
 
     connection.isAlive = true
 
     //evert 5 seconds send a ping to see if user is still online
     connection.timer = setInterval(() => {
-        connection.ping();
+        connection.ping()
         //if the user does not respond in 1 second, kill their connection
         connection.deathTimer = setTimeout(() => {
             connection.isAlive = false

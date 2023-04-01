@@ -11,6 +11,8 @@ function Chat() {
     const [ws, setWs] = useState(null)
     const [onlinePeople, setOnlinePeople] = useState({})
     const [offlinePeople, setOfflinePeople] = useState({})
+    const [onlineFriends, setOnlineFriends] = useState({})
+    const [offlineFriends, setOfflineFriends] = useState({})
     const [selectedUserId, setSelectedUserId] = useState("")
     const [newMessageText, setNewMessageText] = useState("")
     const [messages, setMessages] = useState([])
@@ -36,6 +38,26 @@ function Chat() {
                 connectToWs()
             })
         })
+    }
+
+    const getFriends = async(onlinePeople, offlinePeople, user) => {
+        let onlineTemp = {...onlinePeople}
+        let offlineTemp = {...offlinePeople}
+        
+        const tempFriends = await axios.get("/friends/" + user)
+        const tempFriendsArr = tempFriends.data
+        Object.keys(onlineTemp).map((key) => {
+            if (!tempFriendsArr.includes(onlineTemp[key])){
+                delete onlineTemp[key]
+            }
+        })
+        Object.keys(offlineTemp).map((key) => {
+            if (!tempFriendsArr.includes(offlineTemp[key]['username'])){
+                delete offlineTemp[key]
+            }
+        })
+        setOnlineFriends(onlineTemp)
+        setOfflineFriends(offlineTemp)
     }
 
     //set onlinePeople state to object of online people
@@ -134,6 +156,7 @@ function Chat() {
             })
             setOfflinePeople(offlinePeople)          
         })
+        getFriends(onlinePeople, offlinePeople, username)
     }, [onlinePeople])
 
     //once we chose a user to talk to, load all their messages
@@ -146,6 +169,7 @@ function Chat() {
     }, [selectedUserId])
 
     //get a list of online people exluding the user
+    // const onlinePeopleExcludeSelf = {...onlineFriends}
     const onlinePeopleExcludeSelf = {...onlinePeople}
     delete onlinePeopleExcludeSelf[id]
 
@@ -161,6 +185,7 @@ function Chat() {
             <Sidebar onlinePeopleExcludeSelf={onlinePeopleExcludeSelf} 
                     selectedUserId={selectedUserId} 
                     changeSelectedUserId={changeSelectedUserId}
+                    // offlinePeople={offlineFriends}
                     offlinePeople={offlinePeople}
                     username={username} logout={logout}
                     id={id}
