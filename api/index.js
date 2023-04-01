@@ -63,8 +63,19 @@ app.get("/messages/:userId", async (req, res) => {
 })
 
 //if user requests people, search db find people
-app.get('/people', async(req, res) => { 
+app.get('/people/:username', async(req, res) => { 
+    // const {username} = req.params
+    // const user = await UserModel.findOne({username: username})
+    // const friends = user.friends
     const users = await UserModel.find({}, {'_id': 1, username: 1})
+    // const usersWithFriends = []
+    // users.map((user) => {
+    //     if (friends.indexOf(user.username)){
+    //         console.log("pp")
+    //         usersWithFriends.push(user)
+    //     }
+    // })
+    // console.log(usersWithFriends)
     res.json(users)
 })
 

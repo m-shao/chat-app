@@ -11,6 +11,7 @@ function Chat() {
     const [ws, setWs] = useState(null)
     const [onlinePeople, setOnlinePeople] = useState({})
     const [offlinePeople, setOfflinePeople] = useState({})
+    const [friends, setFriends] = useState([])
     const [onlineFriends, setOnlineFriends] = useState({})
     const [offlineFriends, setOfflineFriends] = useState({})
     const [selectedUserId, setSelectedUserId] = useState("")
@@ -40,24 +41,25 @@ function Chat() {
         })
     }
 
-    const getFriends = async(onlinePeople, offlinePeople, user) => {
-        let onlineTemp = {...onlinePeople}
-        let offlineTemp = {...offlinePeople}
+    const getFriends = async(onlinePeople=null, offlinePeople=null, user=null) => {
+        // let onlineTemp = {...onlinePeople}
+        // let offlineTemp = {...offlinePeople}
         
         const tempFriends = await axios.get("/friends/" + user)
-        const tempFriendsArr = tempFriends.data
-        Object.keys(onlineTemp).map((key) => {
-            if (!tempFriendsArr.includes(onlineTemp[key])){
-                delete onlineTemp[key]
-            }
-        })
-        Object.keys(offlineTemp).map((key) => {
-            if (!tempFriendsArr.includes(offlineTemp[key]['username'])){
-                delete offlineTemp[key]
-            }
-        })
-        setOnlineFriends(onlineTemp)
-        setOfflineFriends(offlineTemp)
+        setFriends(tempFriends)
+        // const tempFriendsArr = tempFriends.data
+        // Object.keys(onlineTemp).map((key) => {
+        //     if (!tempFriendsArr.includes(onlineTemp[key])){
+        //         delete onlineTemp[key]
+        //     }
+        // })
+        // Object.keys(offlineTemp).map((key) => {
+        //     if (!tempFriendsArr.includes(offlineTemp[key]['username'])){
+        //         delete offlineTemp[key]
+        //     }
+        // })
+        // setOnlineFriends(onlineTemp)
+        // setOfflineFriends(offlineTemp)
     }
 
     //set onlinePeople state to object of online people
@@ -146,7 +148,7 @@ function Chat() {
     //whenever the online people changes, find the people who are offline and setOfflinePeople(offlinePeople)
     useEffect(() => {
         //filter the online people out and then put into object form
-        axios.get('/people').then(res => {
+        axios.get('/people/' + username).then(res => {
             const offlinePeopleArr = res.data
                                 .filter(p => p._id !==id)
                                 .filter(p => !Object.keys(onlinePeople).includes(p._id))
@@ -156,7 +158,6 @@ function Chat() {
             })
             setOfflinePeople(offlinePeople)          
         })
-        getFriends(onlinePeople, offlinePeople, username)
     }, [onlinePeople])
 
     //once we chose a user to talk to, load all their messages
