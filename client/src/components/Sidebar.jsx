@@ -37,11 +37,11 @@ function Sidebar({onlinePeopleExcludeSelf, selectedUserId, changeSelectedUserId,
 
     return (
         <>
-            <svg onClick={() => setOpen(true)} className={"block w-12 h-12 m-5 " + (open && "hidden")} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" class="w-6 h-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            <svg onClick={() => setOpen(true)} className={"block w-12 h-12 m-5 " + (open && "hidden")} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
             </svg>
 
-            <div className={"bg-white w-1/3 pt-6 flex flex-col max-w-sm transition-all " + (!open && "hidden")}>
+            <div className={"bg-white w-1/3 pt-6 flex flex-col max-w-sm transition-all sm:absolute sm:h-full sm:w-3/4 " + (!open && "hidden")}>
                 <button onClick={() => setOpen(false)}>
                     <Logo/>
                 </button>
