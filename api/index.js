@@ -64,19 +64,13 @@ app.get("/messages/:userId", async (req, res) => {
 
 //if user requests people, search db find people
 app.get('/people/:username', async(req, res) => { 
-    // const {username} = req.params
-    // const user = await UserModel.findOne({username: username})
-    // const friends = user.friends
-    const users = await UserModel.find({}, {'_id': 1, username: 1})
-    // const usersWithFriends = []
-    // users.map((user) => {
-    //     if (friends.indexOf(user.username)){
-    //         console.log("pp")
-    //         usersWithFriends.push(user)
-    //     }
-    // })
-    // console.log(usersWithFriends)
-    res.json(users)
+    const {username} = req.params
+    const user = await UserModel.findOne({username: username})
+    const friends = user.friends
+    const userFriends = await UserModel.find({
+        username:{$in:friends}
+    }, {'_id': 1, username: 1})
+    res.json(userFriends)
 })
 
 //profile request, verify that browser has a token in cookies, if so send the user's data
@@ -200,8 +194,11 @@ const wss = new ws.WebSocketServer({server})
 
 //on connection
 wss.on('connection', (connection, req) => {
-    const notifyAboutOnlinePeople = () => {
+    const notifyAboutOnlinePeople = async() => {
         //notify everyone about online people (when someone connects)
+        const user = await UserModel.findOne({username: connection.username})
+        const friends = user.friends
+        console.log(friends);
         [...wss.clients].forEach(client => {
                 client.send(JSON.stringify({
                     online: [...wss.clients].map(c => ({userId:c.userId, username:c.username}))

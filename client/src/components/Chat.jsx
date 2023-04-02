@@ -41,25 +41,9 @@ function Chat() {
         })
     }
 
-    const getFriends = async(onlinePeople=null, offlinePeople=null, user=null) => {
-        // let onlineTemp = {...onlinePeople}
-        // let offlineTemp = {...offlinePeople}
-        
+    const getFriends = async(onlinePeople, offlinePeople, user) => {
         const tempFriends = await axios.get("/friends/" + user)
         setFriends(tempFriends)
-        // const tempFriendsArr = tempFriends.data
-        // Object.keys(onlineTemp).map((key) => {
-        //     if (!tempFriendsArr.includes(onlineTemp[key])){
-        //         delete onlineTemp[key]
-        //     }
-        // })
-        // Object.keys(offlineTemp).map((key) => {
-        //     if (!tempFriendsArr.includes(offlineTemp[key]['username'])){
-        //         delete offlineTemp[key]
-        //     }
-        // })
-        // setOnlineFriends(onlineTemp)
-        // setOfflineFriends(offlineTemp)
     }
 
     //set onlinePeople state to object of online people
@@ -78,6 +62,7 @@ function Chat() {
         
         if ('online' in messageData) {
             showOnlinePeople(messageData.online)
+            console.log(messageData.online)
         } else if ('text' in messageData) {
             //if the message reveiveed is from the current user, add it to the conversation
             if (messageData.sender === selectedUserId) {
