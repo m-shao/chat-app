@@ -5,7 +5,7 @@ import Friends from './Friends'
 import axios from 'axios'
 import FriendRequests from "./FriendRequests"
 
-function Sidebar({onlinePeopleExcludeSelf, selectedUserId, changeSelectedUserId, offlinePeople, id, username, logout}) {
+function Sidebar({onlinePeopleExcludeSelf, selectedUserId, changeSelectedUserId, offlinePeople, id, username, logout, friends}) {
     
     const [friendRequestPage, setFriendRequestPage] = useState(false)
     const [friendRequests, setFriendRequests] = useState([])
@@ -57,7 +57,8 @@ function Sidebar({onlinePeopleExcludeSelf, selectedUserId, changeSelectedUserId,
                 <Friends onlinePeopleExcludeSelf={onlinePeopleExcludeSelf} 
                     selectedUserId={selectedUserId} 
                     changeSelectedUserId={changeSelectedUserId} 
-                    offlinePeople={offlinePeople}/>}
+                    offlinePeople={offlinePeople}
+                    friends={friends}/>}
         
             
             <div className="p-2 text-center flex justify-around items-center">

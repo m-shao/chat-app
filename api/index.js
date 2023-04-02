@@ -194,12 +194,21 @@ const wss = new ws.WebSocketServer({server})
 
 //on connection
 wss.on('connection', (connection, req) => {
-    const notifyAboutOnlinePeople = async() => {
+
+    // const findFriends = async () => {
+    //     const user = await UserModel.findOne({username: connection.username})
+    //     const friends = user?.friends
+    //     connection.friends = friends
+    //     notifyAboutOnlinePeople()
+    // }
+
+    const notifyAboutOnlinePeople = () => {
         //notify everyone about online people (when someone connects)
-        const user = await UserModel.findOne({username: connection.username})
-        const friends = user.friends
-        console.log(friends);
+        
+        // console.log(connection.username + " | " + connection.friends);
         [...wss.clients].forEach(client => {
+                // const returnArr = [...wss.clients].filter(user => connection.friends.includes(user.username))
+                
                 client.send(JSON.stringify({
                     online: [...wss.clients].map(c => ({userId:c.userId, username:c.username}))
                 }

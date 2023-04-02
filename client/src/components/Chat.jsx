@@ -12,8 +12,6 @@ function Chat() {
     const [onlinePeople, setOnlinePeople] = useState({})
     const [offlinePeople, setOfflinePeople] = useState({})
     const [friends, setFriends] = useState([])
-    const [onlineFriends, setOnlineFriends] = useState({})
-    const [offlineFriends, setOfflineFriends] = useState({})
     const [selectedUserId, setSelectedUserId] = useState("")
     const [newMessageText, setNewMessageText] = useState("")
     const [messages, setMessages] = useState([])
@@ -41,13 +39,13 @@ function Chat() {
         })
     }
 
-    const getFriends = async(onlinePeople, offlinePeople, user) => {
+    const getFriends = async(user) => {
         const tempFriends = await axios.get("/friends/" + user)
-        setFriends(tempFriends)
+        setFriends(tempFriends.data)
     }
 
     //set onlinePeople state to object of online people
-    function showOnlinePeople(peopleArray){
+    const showOnlinePeople = async (peopleArray) =>{
         const people = {}
         peopleArray.forEach(({userId, username}) => {
             people[userId] = username
@@ -61,8 +59,8 @@ function Chat() {
         const messageData = JSON.parse(e.data)
         
         if ('online' in messageData) {
+            getFriends(username)
             showOnlinePeople(messageData.online)
-            console.log(messageData.online)
         } else if ('text' in messageData) {
             //if the message reveiveed is from the current user, add it to the conversation
             if (messageData.sender === selectedUserId) {
@@ -175,6 +173,7 @@ function Chat() {
                     offlinePeople={offlinePeople}
                     username={username} logout={logout}
                     id={id}
+                    friends={friends}
                     />
 
             <div className="flex flex-col bg-blue-50 w-2/3 p-2 flex-grow">
