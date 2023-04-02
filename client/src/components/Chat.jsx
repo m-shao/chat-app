@@ -176,7 +176,7 @@ function Chat() {
                     friends={friends}
                     />
 
-            <div className="flex flex-col bg-blue-50 w-2/3 p-2 flex-grow">
+            <div className="flex flex-col bg-blue-50 w-2/3 p-2 flex-grow dark:bg-black">
                 <div className="flex-grow">
                     {!selectedUserId && 
                     <div className="flex h-full w-full justify-center items-center">

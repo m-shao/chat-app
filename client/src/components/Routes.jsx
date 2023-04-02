@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import Chat from './Chat'
 import RegisterAndLoginForm from './RegisterAndLoginForm'
 import { UserContext } from '../context/UserContext'
@@ -9,7 +9,6 @@ function Routes() {
     if (username) {
         return <Chat/>
     }
-    
     return (
         <RegisterAndLoginForm/>
     )

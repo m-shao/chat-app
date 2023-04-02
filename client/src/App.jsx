@@ -7,7 +7,8 @@ function App() {
   axios.defaults.withCredentials = true
 
   return (
-      <div className="App">
+    
+      <div className={"App "}>
         <UserContextProvider>
           <Routes/>
         </UserContextProvider>
