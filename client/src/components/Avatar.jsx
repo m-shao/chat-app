@@ -19,8 +19,8 @@ function Avatar({username, online}) {
 
     return (
         <div className={'w-8 h-8 relative rounded-full flex items-center justify-center weight ' + color}>
-            <div className='text-center w-full opacity-70'>{username[0]}</div>
-            <div className={'absolute w-3 h-3 border border-white rounded-full right-0 bottom-0 ' + (online ? "bg-green-500" : "bg-gray-400")}></div>
+            <div className='text-center w-full opacity-70 dark:text-slate-800'>{username[0]}</div>
+            <div className={'absolute w-3 h-3 border border-white dark:border-slate-800 rounded-full right-0 bottom-0 ' + (online ? "bg-green-500" : "bg-gray-400")}></div>
         </div>
     )
 }

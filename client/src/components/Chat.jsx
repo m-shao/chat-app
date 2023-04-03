@@ -176,7 +176,7 @@ function Chat() {
                     friends={friends}
                     />
 
-            <div className="flex flex-col bg-blue-50 w-2/3 p-2 flex-grow dark:bg-black">
+            <div className="flex flex-col bg-blue-50 w-2/3 p-2 flex-grow dark:bg-slate-900">
                 <div className="flex-grow">
                     {!selectedUserId && 
                     <div className="flex h-full w-full justify-center items-center">
@@ -200,10 +200,10 @@ function Chat() {
                                 value={newMessageText}
                                 onChange={e => setNewMessageText(e.target.value)}
                                 placeholder="Type your message here" 
-                                className="bg-white flex-grow border p-2 px-4 rounded-full" />
-                        <label type="submit" className="bg-gray-300 p-3 text-white rounded-full cursor-pointer">
+                                className="bg-white dark:bg-slate-800 dark:border-slate-700 flex-grow border p-2 px-4 rounded-full" />
+                        <label type="submit" className="bg-gray-300 dark:bg-slate-800 p-3 text-white rounded-full cursor-pointer">
                             <input type="file" className="hidden" onChange={sendFile}/>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-gray-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-gray-600 dark:text-gray-500">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
                             </svg>
                         </label>

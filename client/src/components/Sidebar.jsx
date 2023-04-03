@@ -10,8 +10,20 @@ function Sidebar({onlinePeopleExcludeSelf, selectedUserId, changeSelectedUserId,
     
     const [friendRequestPage, setFriendRequestPage] = useState(false)
     const [friendRequests, setFriendRequests] = useState([])
+    const [selectedUsername, setSelectedUsername] = useState("")
     const [settings, setSettings] = useState(false)
     const [open, setOpen] = useState(true)
+
+    useEffect(() => {
+        if (onlinePeopleExcludeSelf[selectedUserId]){
+            setSelectedUsername(onlinePeopleExcludeSelf[selectedUserId])
+        } else if (offlinePeople[selectedUserId]){
+            setSelectedUsername(offlinePeople[selectedUserId].username)
+        } else{
+            setSelectedUsername("")
+        }
+         
+    }, [selectedUserId])
 
     const sendFriendRequests = async(friend) => {
         await axios.post('/friend-request', {username, target:friend})
@@ -36,25 +48,28 @@ function Sidebar({onlinePeopleExcludeSelf, selectedUserId, changeSelectedUserId,
         getFriendRequests(username)
     }, [])
 
+
     return (
         <>
-            <div className={"absolute z-10 w-screen bg-white p-5 transition-all duration-500 flex items-center " + (open && "-translate-y-full")}>
+            <div className={"absolute z-20 w-screen bg-white p-5 transition-all duration-300 flex items-center dark:bg-slate-800 " + (open && "-translate-y-full")}>
                 <svg onClick={() => setOpen(true)} className={"w-10 h-10"} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                 </svg>
-                <h1 className='text-xl ml-5'>{onlinePeopleExcludeSelf[selectedUserId]}</h1>
+                <h1 className='text-xl ml-5'>
+                    {selectedUsername}
+                </h1>
             </div>
             
 
-            <div className={"bg-white w-1/3 pt-6 flex flex-col max-w-sm transition-all duration-500 sm:absolute z-10 sm:h-full sm:w-3/4 h-full " 
-            + (!open && " -translate-x-full w-0 opacity-0")}>
+            <div className={"bg-white pt-6 flex flex-col max-w-sm transition-all duration-300 sm:absolute z-10 sm:h-full sm:w-3/4 h-full dark:bg-slate-800 " 
+            + (!open ? " absolute -translate-x-full w-0 opacity-0" : "w-1/3")}>
                 <button onClick={() => setOpen(false)}>
                     <Logo/>
                 </button>
                 {settings ? <Settings logout={logout}/> :
                     <div className='h-full w-full'>
                         <button onClick={() => {setFriendRequestPage(prev => !prev)}}
-                        className={"flex gap-2 border-b border-gray-100 pl-5 py-3 w-full "  + (friendRequestPage && "bg-gray-100")}>
+                        className={"flex gap-2 border-b border-gray-100 dark:border-slate-700 pl-5 py-3 w-full "  + (friendRequestPage && "bg-gray-100 dark:bg-slate-700")}>
                             <div className='relative'>  
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
@@ -66,11 +81,13 @@ function Sidebar({onlinePeopleExcludeSelf, selectedUserId, changeSelectedUserId,
                         </button> 
                     
                         {friendRequestPage ? 
-                            <FriendRequests sendFriendRequests={sendFriendRequests} 
-                                            friendRequests={friendRequests}
-                                            verifyFriendRequests={verifyFriendRequests}
-                                            user={username}/> :
-                            <Friends onlinePeopleExcludeSelf={onlinePeopleExcludeSelf} 
+                            <FriendRequests 
+                                sendFriendRequests={sendFriendRequests} 
+                                friendRequests={friendRequests}
+                                verifyFriendRequests={verifyFriendRequests}
+                                user={username}/> :
+                            <Friends 
+                                onlinePeopleExcludeSelf={onlinePeopleExcludeSelf} 
                                 selectedUserId={selectedUserId} 
                                 changeSelectedUserId={changeSelectedUserId} 
                                 offlinePeople={offlinePeople}

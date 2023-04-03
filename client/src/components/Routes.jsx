@@ -6,11 +6,10 @@ import { UserContext } from '../context/UserContext'
 function Routes() {
     const {username, id} = useContext(UserContext)
 
-    if (username) {
-        return <Chat/>
-    }
     return (
-        <RegisterAndLoginForm/>
+        <div className='dark:text-white bg-black'>
+            {username? <Chat/> : <RegisterAndLoginForm/>}
+        </div>
     )
 }
 
