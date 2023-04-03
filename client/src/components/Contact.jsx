@@ -4,8 +4,8 @@ function Contact({id, username, onClick, selected, online, request, verifyFriend
     return (
         <div key={id ? id : username} 
             onClick={id?() => onClick(id): () => {}}
-            className={"border-b border-gray-100 dark:border-slate-700 flex justify-between items-center gap-2 cursor-pointer pr-4 "
-            + (selected ? 'bg-blue-50 dark:bg-slate-700' : '')}>   
+            className={"border-b border-gray-100 dark:border-neutral-700 flex justify-between items-center gap-2 cursor-pointer pr-4 "
+            + (selected ? 'bg-blue-50 dark:bg-neutral-700' : '')}>   
             <div className="flex">
                 {selected && (
                     <div className="w-1 bg-blue-500 h-12 rounded-r-md"></div>
