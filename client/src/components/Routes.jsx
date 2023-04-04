@@ -7,7 +7,7 @@ function Routes() {
     const {username, id} = useContext(UserContext)
 
     return (
-        <div className='dark:text-white bg-black'>
+        <div className='dark:text-white'>
             {username? <Chat/> : <RegisterAndLoginForm/>}
         </div>
     )

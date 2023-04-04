@@ -18,22 +18,22 @@ function RegisterAndLoginForm() {
     }
 
     return (
-        <div className="bg-blue-50 h-screen flex items-center">
+        <div className="bg-blue-50 dark:bg-neutral-900 h-screen flex items-center">
             <form action="" className="w-64 mx-auto mb-12" onSubmit={handleSubmit}> 
                 <input value={username} 
                     onChange={(e) => {setUsername(e.target.value)}} 
                     type="text" placeholder="username" 
-                    className="block w-full rounded-sm p-2 mb-2 border"/>
+                    className="block w-full rounded-sm p-2 mb-2 border dark:bg-neutral-800 dark:border-neutral-900"/>
 
                 <input value={password} 
                     onChange={(e) => {setPassword(e.target.value)}} 
                     type="password" 
                     placeholder="password" 
-                    className="block w-full rounded-sm p-2 mb-2 border"/>
+                    className="block w-full rounded-sm p-2 mb-2 border dark:bg-neutral-800 dark:border-neutral-900"/>
                 <button className="bg-blue-500 text-white block w-full rounded-sm p-2">{
                     isLoginOrRegister === "register"? "Register" : "Login"}
                 </button>
-                <div className="text-center mt-2">
+                <div className="text-center mt-2 dark:text-neutral-500">
                     
                     {isLoginOrRegister === "register" && (
                         <div>

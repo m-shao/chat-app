@@ -5,7 +5,7 @@ function Settings({logout}) {
     const {darkmode, changeDarkmode} = useContext(darkmodeContext)
 
     return (
-        <div className='h-full px-4 py-2 text-gray-500 flex flex-col justify-start gap-4'>
+        <div className='h-full px-4 py-2 text-gray-500 dark:text-white flex flex-col justify-start gap-4'>
             <button onClick={changeDarkmode} className="flex items-center gap-2 border-b border-gray-100 dark:border-neutral-700 p-2 transition-all">
                 {!darkmode ? 
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">

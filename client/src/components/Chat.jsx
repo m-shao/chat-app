@@ -91,6 +91,7 @@ function Chat() {
             text: newMessageText,
             file: file,
         }))
+        console.log(file)
         //reset the text field
         setNewMessageText("")
         //append the message onto messages state

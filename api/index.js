@@ -82,7 +82,7 @@ app.get("/profile", (req, res) => {
             res.json(userData)
         })
     } else {
-        res.status(401).json("no token")
+        res.json("no token")
     }
 })
 

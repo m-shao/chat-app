@@ -77,7 +77,7 @@ function Sidebar({onlinePeopleExcludeSelf, selectedUserId, changeSelectedUserId,
                                 {friendRequests.length > 0 && <div className='bg-red-500 w-2.5 h-2.5 rounded-full absolute top-0 right-0'></div>}
                                 
                             </div>
-                            <h1>Friends</h1>
+                            <h1>Friend Requests</h1>
                         </button> 
                     
                         {friendRequestPage ? 
