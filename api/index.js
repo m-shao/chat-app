@@ -28,7 +28,7 @@ app.use(cors({
 }))
 
 
-//
+//Look at the cookie token, verify that it's correct and login user if valid
 const getUserDataFromRequest = async (req) => {
     return new Promise((resolve, reject) => {
         const token = req.cookies?.token
@@ -43,14 +43,13 @@ const getUserDataFromRequest = async (req) => {
     })
 }
 
-//test to verify server
+//test to verify server state
 app.get("/test", (req, res) => {
     res.json("test ok")
 })
 
 //search for messages on user request
 app.get("/messages/:userId", async (req, res) => {
-    // 
     const {userId} = req.params;
     const userData = await getUserDataFromRequest(req)
     const ourUserId = userData.userId
@@ -89,6 +88,7 @@ app.get("/profile", (req, res) => {
 app.post("/friend-request", async(req, res) => {
     const {username, target} = req.body
     
+    //add the name of the request to the target's database entry of friends
     if (target != username){
         UserModel.findOneAndUpdate(
             {username: target},
@@ -100,6 +100,7 @@ app.post("/friend-request", async(req, res) => {
     
 })
 
+//find and return the user's friend requests
 app.get("/friend-request/:username", async(req, res) => {
     const {username} = req.params
     const user = await UserModel.findOne({username: username})
@@ -108,13 +109,17 @@ app.get("/friend-request/:username", async(req, res) => {
 })
 
 app.put("/friend-request/", async(req, res) => {
+    //state is True if they accepted, False otherwise
+
     const {username, target, state} = req.body
+    //delete the friend request from the user's friend requests
     UserModel.findOneAndUpdate(
         {username: username},
         { $pull: { frequests: target } },
         { new: true }).then((hello) => {
             console.log(hello)
     })
+    //if the user accepts the request add eachother to the db of the recipiend and the sender
     if (state){
         UserModel.findOneAndUpdate(
             {username: username},
@@ -132,6 +137,7 @@ app.put("/friend-request/", async(req, res) => {
 
 })
 
+//return the user's friends
 app.get("/friends/:username", async(req, res) => {
     const {username} = req.params
     const user = await UserModel.findOne({username: username})
