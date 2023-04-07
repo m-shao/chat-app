@@ -11,6 +11,7 @@ function Chat() {
     const [ws, setWs] = useState(null)
     const [onlinePeople, setOnlinePeople] = useState({})
     const [offlinePeople, setOfflinePeople] = useState({})
+    const [friendRequests, setFriendRequests] = useState([])
     const [friends, setFriends] = useState([])
     const [selectedUserId, setSelectedUserId] = useState("")
     const [newMessageText, setNewMessageText] = useState("")
@@ -53,14 +54,19 @@ function Chat() {
         setOnlinePeople(people)
     }
 
-    //when message is reveived:
+    //when data is reveived from web socket
     function handleMessage(e) {
         //reveive message data
         const messageData = JSON.parse(e.data)
         
+        //if the message reveiveed is a list of online people, set onlinePeople state
         if ('online' in messageData) {
             getFriends(username)
             showOnlinePeople(messageData.online)
+        } 
+        //remove this code to get rid of live friend requests
+        else if ("friendRequest" in messageData){
+            setFriendRequests(messageData.friendRequest)
         } else if ('text' in messageData) {
             //if the message reveiveed is from the current user, add it to the conversation
             if (messageData.sender === selectedUserId) {
@@ -91,7 +97,6 @@ function Chat() {
             text: newMessageText,
             file: file,
         }))
-        console.log(file)
         //reset the text field
         setNewMessageText("")
         //append the message onto messages state
@@ -175,6 +180,8 @@ function Chat() {
                     username={username} logout={logout}
                     id={id}
                     friends={friends}
+                    friendRequests={friendRequests}
+                    setFriendRequests={setFriendRequests}
                     />
 
             <div className="flex flex-col bg-blue-50 w-2/3 p-2 flex-grow dark:bg-neutral-900">

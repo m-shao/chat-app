@@ -6,10 +6,9 @@ import axios from 'axios'
 import FriendRequests from "./FriendRequests"
 import Settings from './Settings'
 
-function Sidebar({onlinePeopleExcludeSelf, selectedUserId, changeSelectedUserId, offlinePeople, id, username, logout, friends}) {
+function Sidebar({onlinePeopleExcludeSelf, selectedUserId, changeSelectedUserId, offlinePeople, id, username, logout, friends, friendRequests, setFriendRequests}) {
     
     const [friendRequestPage, setFriendRequestPage] = useState(false)
-    const [friendRequests, setFriendRequests] = useState([])
     const [selectedUsername, setSelectedUsername] = useState("")
     const [settings, setSettings] = useState(false)
     const [open, setOpen] = useState(true)

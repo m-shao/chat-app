@@ -90,12 +90,10 @@ app.post("/friend-request", async(req, res) => {
     
     //add the name of the request to the target's database entry of friends
     if (target != username){
-        UserModel.findOneAndUpdate(
+        await UserModel.findOneAndUpdate(
             {username: target},
             { $addToSet: { frequests: [username] } },
-            { new: true }).then((hello) => {
-                console.log(hello)
-        })
+            { new: true })
     }
     
 })
@@ -113,26 +111,20 @@ app.put("/friend-request/", async(req, res) => {
 
     const {username, target, state} = req.body
     //delete the friend request from the user's friend requests
-    UserModel.findOneAndUpdate(
+    await UserModel.findOneAndUpdate(
         {username: username},
         { $pull: { frequests: target } },
-        { new: true }).then((hello) => {
-            console.log(hello)
-    })
+        { new: true })
     //if the user accepts the request add eachother to the db of the recipiend and the sender
     if (state){
-        UserModel.findOneAndUpdate(
+        await UserModel.findOneAndUpdate(
             {username: username},
             { $addToSet: { friends: [target] } },
-            { new: true }).then((hello) => {
-                console.log(hello)
-        })
-        UserModel.findOneAndUpdate(
+            { new: true })
+            await UserModel.findOneAndUpdate(
             {username: target},
             { $addToSet: { friends: [username] } },
-            { new: true }).then((hello) => {
-                console.log(hello)
-        })
+            { new: true })
     }
 
 })
@@ -200,6 +192,22 @@ const wss = new ws.WebSocketServer({server})
 
 //on connection
 wss.on('connection', (connection, req) => {
+
+    //remove this code to get rid of live friend requests
+    const changeStream = UserModel.watch([{ $match: { username: connection.username } }], { fullDocument: 'updateLookup' });
+
+    changeStream.on('change', (change) => {
+        //if a message is sent, send it to the recipient
+        if (change.operationType === 'update') {
+            const message = change.fullDocument;
+            [...wss.clients].forEach(client => {
+                if (client.username === message.username) {
+                    client.send(JSON.stringify({"friendRequest":message.frequests}))
+                }
+            })
+        }
+    })
+    //end of live friend requests code
 
     const notifyAboutOnlinePeople = () => {
         //notify everyone about online people (when someone connects)
